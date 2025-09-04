@@ -1,52 +1,52 @@
 namespace Ucu.Poo.GameOfLife;
 
-public class GameLogic
+public static class GameLogic
 {
-    bool[,] gameBoard = /* aca va lo de load */;
-    int boardWidth = gameBoard.GetLength(0);
-    int boardHeight = gameBoard.GetLength(1);
-
-    bool[,] cloneboard = new bool[boardWidth, boardHeight];
-        for (int x = 0; x < boardWidth; x++)
+    public static Board CalculateNextGeneration(Board currentBoard)
     {
-        for (int y = 0; y < boardHeight; y++)
+        int width = currentBoard.Width;
+        int height = currentBoard.Height;
+        bool[,] currentGrid = currentBoard.Grid;
+        bool[,] newGrid = new bool[height, width];
+
+        for (int y = 0; y < height; y++)
         {
-            int aliveNeighbors = 0;
-            for (int i = x-1; i<=x+1;i++)
+            for (int x = 0; x < width; x++)
             {
-                for (int j = y-1;j<=y+1;j++)
-                {
-                    if(i>=0 && i<boardWidth && j>=0 && j < boardHeight && gameBoard[i,j])
-                    {
-                        aliveNeighbors++;
-                    }
-                }
-            }
-            if(gameBoard[x,y])
-            {
-                aliveNeighbors--;
-            }
-            if (gameBoard[x,y] && aliveNeighbors < 2)
-            {
-                //Celula muere por baja población
-                cloneboard[x,y] = false;
-            }
-            else if (gameBoard[x,y] && aliveNeighbors > 3)
-            {
-                //Celula muere por sobrepoblación
-                cloneboard[x,y] = false;
-            }
-            else if (!gameBoard[x,y] && aliveNeighbors == 3)
-            {
-                //Celula nace por reproducción
-                cloneboard[x,y] = true;
-            }
-            else
-            {
-                //Celula mantiene el estado que tenía
-                cloneboard[x,y] = gameBoard[x,y];
+                int liveNeighbors = CountLiveNeighbors(currentGrid, x, y, width, height);
+                bool isAlive = currentGrid[y, x];
+
+                // Aplicar reglas de Conway
+                if (isAlive && liveNeighbors < 2)
+                    newGrid[y, x] = false;
+                else if (isAlive && liveNeighbors > 3)
+                    newGrid[y, x] = false;
+                else if (!isAlive && liveNeighbors == 3)
+                    newGrid[y, x] = true;
+                else
+                    newGrid[y, x] = isAlive;
             }
         }
+
+        return new Board(width, height) { Grid = newGrid };
     }
-    gameBoard = cloneboard;
+
+    private static int CountLiveNeighbors(bool[,] grid, int x, int y, int width, int height)
+    {
+        int count = 0;
+        for (int i = -1; i <= 1; i++)
+        {
+            for (int j = -1; j <= 1; j++)
+            {
+                if (i == 0 && j == 0) continue;
+
+                int col = (x + i + width) % width;
+                int row = (y + j + height) % height;
+
+                if (grid[row, col])
+                    count++;
+            }
+        }
+        return count;
+    }
 }
