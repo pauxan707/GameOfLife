@@ -1,6 +1,6 @@
 namespace Ucu.Poo.GameOfLife;
 
-public class PrintBoard
+public class Board
 {
     bool[,] b //variable que representa el tablero
     int width //variabe que representa el ancho del tablero
