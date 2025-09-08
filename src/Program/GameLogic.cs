@@ -1,12 +1,12 @@
 namespace Ucu.Poo.GameOfLife;
 
-public static class GameLogic
+public static class GameLogic //A pesar de tener dos métodos, uno es complementario del principal, y engloban la misma responsabilidad de aplicar las reglas a un tablero. Por lo tanto, la única manera de que cambie es si cambia la lógica fundamental del juego, por lo tanto cumple con SRP. Luego, en cuanto a Expert, la cumple bastante ya que es la clase que conoce los "live neighbours", y es la que los utiliza.
 {
-    public static Board CalculateNextGeneration(Board currentBoard)
+    public static bool[,] CalculateNextGeneration(bool[,] currentBoard)
     {
-        int width = currentBoard.Width;
-        int height = currentBoard.Height;
-        bool[,] currentGrid = currentBoard.Grid;
+        int width = currentBoard.GetLength(1);
+        int height = currentBoard.GetLength(0);
+        bool[,] currentGrid = currentBoard;
         bool[,] newGrid = new bool[height, width];
 
         for (int y = 0; y < height; y++)
@@ -16,7 +16,7 @@ public static class GameLogic
                 int liveNeighbors = CountLiveNeighbors(currentGrid, x, y, width, height);
                 bool isAlive = currentGrid[y, x];
 
-                // Aplicar reglas de Conway
+                
                 if (isAlive && liveNeighbors < 2)
                     newGrid[y, x] = false;
                 else if (isAlive && liveNeighbors > 3)
@@ -28,7 +28,7 @@ public static class GameLogic
             }
         }
 
-        return new Board(width, height) { Grid = newGrid };
+        return newGrid;
     }
 
     private static int CountLiveNeighbors(bool[,] grid, int x, int y, int width, int height)
